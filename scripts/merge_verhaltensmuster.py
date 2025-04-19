@@ -1,25 +1,37 @@
 import os
 import json
 
-# Relativer Pfad zum Verzeichnis mit den einzelnen JSON-Dateien
-verzeichnis = os.path.join(os.path.dirname(__file__), "..", "content", "verhaltensmuster")
+# Neuer Pfad zu /data/
+verzeichnis = os.path.join(os.path.dirname(__file__), "..", "data")
 
 def lade_verhaltensmuster_aus_ordner(ordnerpfad):
-    muster_liste = []
+    muster_dict = {}
 
     for dateiname in sorted(os.listdir(ordnerpfad)):
-        if dateiname.endswith(".json"):
+        if dateiname.endswith(".json") and not dateiname.startswith("verhaltensmuster_gesamt"):
             pfad = os.path.join(ordnerpfad, dateiname)
             with open(pfad, "r", encoding="utf-8") as f:
-                inhalt = json.load(f)
-                muster_liste.append(inhalt)
+                try:
+                    inhalt = json.load(f)
 
-    return muster_liste
+                    if isinstance(inhalt, list):
+                        for eintrag in inhalt:
+                            frage = eintrag.get("frage")
+                            if frage:
+                                muster_dict[frage] = eintrag
+                    elif isinstance(inhalt, dict):
+                        frage = inhalt.get("frage")
+                        if frage:
+                            muster_dict[frage] = inhalt
+
+                except json.JSONDecodeError as e:
+                    print(f"⚠️ Fehler in {dateiname}: {e}")
+
+    return muster_dict
 
 if __name__ == "__main__":
     verhaltensmuster = lade_verhaltensmuster_aus_ordner(verzeichnis)
 
-    # Optional: Zusammengeführte Datei speichern (z. B. im gleichen content-Verzeichnis)
     zielpfad = os.path.join(verzeichnis, "verhaltensmuster_gesamt.json")
     with open(zielpfad, "w", encoding="utf-8") as f:
         json.dump(verhaltensmuster, f, ensure_ascii=False, indent=2)
