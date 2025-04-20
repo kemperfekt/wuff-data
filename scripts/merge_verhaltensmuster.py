@@ -2,7 +2,8 @@ import os
 import json
 
 # Neuer Pfad zu /data/
-verzeichnis = os.path.join(os.path.dirname(__file__), "..", "data")
+verzeichnis = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "content", "verhaltensmuster"))
+
 
 def lade_verhaltensmuster_aus_ordner(ordnerpfad):
     muster_dict = {}
