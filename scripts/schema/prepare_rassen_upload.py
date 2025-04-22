@@ -1,9 +1,12 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import pandas as pd
 from pprint import pprint
 from pathlib import Path
 
 # Excel einlesen
-path = Path("Rasseliste_import.xlsx")
+path = Path("../../data/rassen/Rasseliste_import.xlsx")
 df_rassen = pd.read_excel(path, sheet_name="Rassen", dtype={"gruppen_code": str})
 df_mapping = pd.read_excel(path, sheet_name="Mapping", dtype={"gruppen_code": str})
 df_joined = pd.merge(df_rassen, df_mapping, on="gruppen_code", how="left")

@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from connect_weaviate import get_weaviate_client
 import weaviate.classes.config as wc
 

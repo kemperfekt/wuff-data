@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import json
 from connect_weaviate import get_weaviate_client
 
@@ -6,7 +9,7 @@ client = get_weaviate_client()
 collection = client.collections.get("Instinktveranlagung")
 
 # JSON-Datei laden
-with open("instinktveranlagung.json", "r", encoding="utf-8") as f:
+with open("../../data/instinktveranlagung/instinktveranlagung.json", "r", encoding="utf-8") as f:
     daten = json.load(f)
 
 # Objekte hochladen

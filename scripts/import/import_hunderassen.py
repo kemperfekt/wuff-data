@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 import pandas as pd
 from connect_weaviate import get_weaviate_client
 from weaviate.classes.query import Filter
@@ -8,7 +11,7 @@ col_rassen = client.collections.get("Hunderassen")
 col_instinkte = client.collections.get("Instinktveranlagung")
 
 # Schritt 2: Excel-Datei laden
-df = pd.read_excel("Rasseliste_import.xlsx", sheet_name="Rassen", dtype={"gruppen_code": str})
+df = pd.read_excel("../../data/rassen/Rasseliste_import.xlsx", sheet_name="Rassen", dtype={"gruppen_code": str})
 
 # Schritt 3–5: Filter anwenden, Daten hochladen
 erfolg = 0

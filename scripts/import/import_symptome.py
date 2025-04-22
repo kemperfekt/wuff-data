@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from connect_weaviate import get_weaviate_client
 import json
 
@@ -5,7 +8,7 @@ client = get_weaviate_client()
 col = client.collections.get("Symptom")
 
 # Datei laden
-with open("symptome_verhaltensmuster.json", "r") as f:
+with open("../../data//symptome/symptome_verhaltensmuster.json", "r") as f:
     symptome = json.load(f)
 
 # Upload vorbereiten
