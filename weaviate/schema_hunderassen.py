@@ -1,28 +1,52 @@
+import pandas as pd
 from connect_weaviate import get_weaviate_client
-import weaviate.classes.config as wc
+from weaviate.classes.query import Filter
 
-# Verbindung zu Weaviate aufbauen
+# Schritt 1: Verbindung aufbauen
 client = get_weaviate_client()
+col_rassen = client.collections.get("Hunderassen")
+col_instinkte = client.collections.get("Instinktveranlagung")
 
-# Vorher löschen, falls vorhanden
-if client.collections.exists("Hunderassen"):
-    client.collections.delete("Hunderassen")
+# Schritt 2: Excel laden
+df = pd.read_excel("Rasseliste_import.xlsx", sheet_name="Rassen", dtype={"gruppen_code": str})
 
-# Neue Collection erstellen
-client.collections.create(
-    name="Hunderassen",
-    properties=[
-        wc.Property(name="rassename", data_type=wc.DataType.TEXT),
-        wc.Property(name="alternative_namen", data_type=wc.DataType.TEXT),
-        wc.Property(name="ursprungsland", data_type=wc.DataType.TEXT),
-        wc.Property(name="gruppen_code", data_type=wc.DataType.TEXT),
-    ],
-    references=[
-        wc.ReferenceProperty(name="verweis_instinktveranlagung", target_collection="Instinktveranlagung")
-    ],
-    vectorizer_config=wc.Configure.Vectorizer.text2vec_openai(),
-    generative_config=wc.Configure.Generative.openai()
-)
+# Schritt 3–5: Daten iterieren, Referenz suchen, einfügen
+erfolg = 0
+fehler = []
 
-print("Collection 'Hunderassen' wurde erfolgreich erstellt.")
+for _, row in df.iterrows():
+    gruppen_code = row["gruppen_code"]
+    rassename = row["rassename"]
+
+    # Filter auf Instinktveranlagung
+    filter_expr = Filter.by_property("gruppen_code").equal(gruppen_code)
+    instinkt_result = col_instinkte.query.fetch_objects(
+        filters=filter_expr,
+        return_properties=["gruppen_code"]
+    )
+
+    if not instinkt_result.objects:
+        fehler.append((rassename, gruppen_code))
+        continue
+
+    instinkt_uuid = instinkt_result.objects[0].uuid
+
+    # Korrekte Referenz: direkt als String
+    col_rassen.data.insert({
+        "rassename": row["rassename"],
+        "alternative_namen": row["alternative_namen"],
+        "ursprungsland": row["ursprungsland"],
+        "gruppen_code": gruppen_code,
+        "verweis_instinktveranlagung": f"weaviate://localhost/Instinktveranlagung/{instinkt_uuid}"
+    })
+
+    erfolg += 1
+
+# Schritt 6: Abschluss
 client.close()
+
+print(f"✅ Upload abgeschlossen: {erfolg} erfolgreich, {len(fehler)} fehlgeschlagen.")
+if fehler:
+    print("⚠️ Fehlgeschlagene Zuordnungen:")
+    for name, code in fehler:
+        print(f"  - {name} (gruppen_code: {code})")
