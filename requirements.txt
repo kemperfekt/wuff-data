@@ -31,4 +31,4 @@ weaviate-client
 pandas
 openpyxl
 python-dotenv==1.0.1
-
+fastapi
