@@ -6,7 +6,7 @@ import json
 import weaviate
 from pathlib import Path
 from weaviate.classes.init import Auth
-from weaviate.classes.config import Property, DataType
+from weaviate.classes.config import Property, DataType, Configure
 
 # Optional: für Debug-Zwecke
 from weaviate.classes.query import MetadataQuery
@@ -33,8 +33,10 @@ def create_collection(client: weaviate.WeaviateClient):
             Property(name="beschreibung", data_type=DataType.TEXT),
             Property(name="emotion", data_type=DataType.TEXT),
             Property(name="instinkte", data_type=DataType.TEXT_ARRAY),
-        ]
+         ],
+        vectorizer_config=Configure.Vectorizer.text2vec_openai()  
     )
+
     print(f"✅ Collection '{COLLECTION_NAME}' wurde erstellt.")
 
 def upload_chunks(client: weaviate.WeaviateClient):

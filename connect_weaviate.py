@@ -15,6 +15,6 @@ def get_weaviate_client():
         cluster_url=weaviate_url,
         auth_credentials=Auth.api_key(weaviate_api_key),
         headers={
-        "X-Openai-Api-Key": openai_api_key
+        "X-OpenAI-Api-Key": openai_api_key
     }
     )
