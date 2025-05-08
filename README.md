@@ -15,14 +15,9 @@ dogbot-ops serves as the foundation for the DogBot diagnosis engine. It provides
 - Weaviate schemas – to structure and validate all data collections
 
 ## 🧱 Data Overview
-Component           Description
-symptome.json	    Problem behavior including tags and root cause guesses
-verhaltensmuster	Structured explanations of typical behavioral patterns
-rueckfragen_*	    Follow-up questions by instinct type
-rassen.json	        Breed-specific instinct profiles
-schema_*.py	        Scripts to define or update Weaviate schemas
+Various vectorized weaviate collections with information on symptoms, root causes etc.
 
 ## 🔄 Related Repositories
-🤖 GPT-powered backend for diagnosis: https://github.com/kemperfekt/dogbot-agent
-🖥️ Visual frontend for human–dog interaction: https://github.com/kemperfekt/dogbot-ui
+🤖 RAG-powered backend for diagnosis: https://github.com/kemperfekt/dogbot-agent
+🖥️ Mobile frontend for interaction: https://github.com/kemperfekt/dogbot-ui
 🐶 Project meta-repo with vision and coordination: https://github.com/kemperfekt/dogbot
