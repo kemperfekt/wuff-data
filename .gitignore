@@ -9,6 +9,7 @@ venv/
 .venv/
 
 # Data
+archive/
 *.pkl
 *.db
 *.sqlite3
