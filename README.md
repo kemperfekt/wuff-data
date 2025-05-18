@@ -15,12 +15,12 @@ dogbot-ops serves as the foundation for the DogBot diagnosis engine. It provides
 - Weaviate schemas – to structure and validate all data collections
 
 ## 🧱 Data Overview
-Component           Description
-symptome.json	    Problem behavior including tags and root cause guesses
-verhaltensmuster	Structured explanations of typical behavioral patterns
-rueckfragen_*	    Follow-up questions by instinct type
-rassen.json	        Breed-specific instinct profiles
-schema_*.py	        Scripts to define or update Weaviate schemas
+Komponente               | Beschreibung
+------------------------|--------------------------------------------------
+Excel-Datei             | Enthält alle strukturierten Inhalte (z. B. Symptome, Instinkte, Rassen)
+`schema/*.json`         | Generierte Weaviate-Klassen basierend auf den Excel-Sheets
+`data/*.json`           | Automatisch aus der Excel-Datei exportierte Datensätze
+`scripts/*.py`          | Automatisierte Tools für Schemaerzeugung, Datenexport und Import in Weaviate
 
 ## 🔄 Related Repositories
 🤖 GPT-powered backend for diagnosis: https://github.com/kemperfekt/dogbot-agent
