@@ -1,10 +1,8 @@
-
-
 import pandas as pd
 import json
 from pathlib import Path
 
-excel_path = "dogbot_content.xlsx"
+excel_path = "../data/dogbot_content.xlsx"
 schema_dir = Path("schema")
 schema_dir.mkdir(exist_ok=True)
 
