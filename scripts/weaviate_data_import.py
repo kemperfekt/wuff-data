@@ -26,7 +26,7 @@ def main():
     print(f"Weaviate bereit: {client.is_ready()}")
 
     # Import für Allgemein
-    def import_allgemein(data_file="dogbot_content_Allgemein.json"):
+    def import_allgemein(data_file="../data/json/dogbot_content_Allgemein.json"):
         with open(data_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -59,7 +59,7 @@ def main():
         print("Import Allgemein abgeschlossen.")
 
     # Import für Instinkte
-    def import_instinkte(data_file="dogbot_content_Instinkte.json"):
+    def import_instinkte(data_file="../data/json/dogbot_content_Instinkte.json"):
         with open(data_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -92,7 +92,7 @@ def main():
         print("Import Instinkte abgeschlossen.")
 
     # Import für Instinktveranlagung
-    def import_instinktveranlagung(data_file="dogbot_content_Instinktveranlagung.json"):
+    def import_instinktveranlagung(data_file="../data/json/dogbot_content_Instinktveranlagung.json"):
         with open(data_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -140,7 +140,7 @@ def main():
         print("Import Instinktveranlagung abgeschlossen.")
 
     # Import für Rassen
-    def import_rassen(data_file="dogbot_content_Rassen.json"):
+    def import_rassen(data_file="../data/json/dogbot_content_Rassen.json"):
         with open(data_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -211,7 +211,7 @@ def main():
             print(f"Fehler bei {len(rassen_collection.batch.failed_references)} Rassen-Referenzen")
 
     # Import für Erziehung
-    def import_erziehung(data_file="dogbot_content_Erziehung.json"):
+    def import_erziehung(data_file="../data/json/dogbot_content_Erziehung.json"):
         with open(data_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -276,7 +276,7 @@ def main():
             print(f"Fehler bei {len(erziehung_collection.batch.failed_references)} Erziehung-Referenzen")
 
     # Import für Symptome
-    def import_symptome(data_file="dogbot_content_Symptome.json"):
+    def import_symptome(data_file="../data/json/dogbot_content_Symptome.json"):
         with open(data_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -354,12 +354,12 @@ def main():
 
     # Daten importieren
     try:
-        import_allgemein("dogbot_content_Allgemein.json")
-        import_instinkte("dogbot_content_Instinkte.json")
-        import_instinktveranlagung("dogbot_content_Instinktveranlagung.json")
-        import_rassen("dogbot_content_Rassen.json")
-        import_erziehung("dogbot_content_Erziehung.json")
-        import_symptome("dogbot_content_Symptome.json")
+        import_allgemein()
+        import_instinkte()
+        import_instinktveranlagung()
+        import_rassen()
+        import_erziehung()
+        import_symptome()
         
         print("Datenimport abgeschlossen!")
     except Exception as e:

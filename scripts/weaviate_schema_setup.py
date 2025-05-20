@@ -1,8 +1,11 @@
 # weaviate_schema_setup.py
 import weaviate
 import weaviate.classes.config as wvcc
+from weaviate.collections.classes.config import Property
+from weaviate.collections.classes.config import Tokenization
 from weaviate.auth import AuthApiKey
 import os
+import warnings; warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def main():
     # Bestehende Weaviate-Zugangsdaten verwenden
@@ -17,6 +20,14 @@ def main():
         headers={"X-OpenAI-Api-Key": openai_api_key} if openai_api_key else {}
     )
 
+    try:
+        existing_collections = client.collections.list_all().keys()
+        for name in existing_collections:
+            client.collections.delete(name)
+        print(f"Alle bestehenden Collections gelöscht: {', '.join(existing_collections)}")
+    except Exception as e:
+        print(f"Fehler beim Löschen bestehender Collections: {e}")
+
     print(f"Weaviate bereit: {client.is_ready()}")
 
     try:
@@ -26,9 +37,9 @@ def main():
             description="Grundlegende Informationen über Hunde, ihre Bedürfnisse und Verhalten",
             vectorizer_config=wvcc.Configure.Vectorizer.text2vec_openai(),
             properties=[
-                wvcc.Property(name="thema", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="beschreibung", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="hundeperspektive", data_type=wvcc.DataType.TEXT)
+                Property(name="thema", data_type=wvcc.DataType.TEXT),
+                Property(name="beschreibung", data_type=wvcc.DataType.TEXT),
+                Property(name="hundeperspektive", data_type=wvcc.DataType.TEXT)
             ]
         )
 
@@ -38,9 +49,16 @@ def main():
             description="Die vier grundlegenden Instinkte von Hunden",
             vectorizer_config=wvcc.Configure.Vectorizer.text2vec_openai(),
             properties=[
-                wvcc.Property(name="instinkt", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="beschreibung", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="hundesperspektive", data_type=wvcc.DataType.TEXT)
+                Property(
+                    name="instinkt",
+                    data_type=wvcc.DataType.TEXT,
+                    description="Instinkt",
+                    index_filterable=True,
+                    index_searchable=True,
+                    tokenization=Tokenization.FIELD
+                ),
+                Property(name="beschreibung", data_type=wvcc.DataType.TEXT),
+                Property(name="hundesperspektive", data_type=wvcc.DataType.TEXT)
             ]
         )
 
@@ -50,19 +68,45 @@ def main():
             description="Hundegruppen mit spezifischer Instinktverteilung",
             vectorizer_config=wvcc.Configure.Vectorizer.text2vec_openai(),
             properties=[
-                wvcc.Property(name="gruppen_code", data_type=wvcc.DataType.NUMBER),
-                wvcc.Property(name="uebergruppe", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="gruppe", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="funktion", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="merkmale", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="rassevertreter", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="rassenbeispiele", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="erziehungsanforderung", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="jagdinstinkt", data_type=wvcc.DataType.NUMBER),
-                wvcc.Property(name="territorialinstinkt", data_type=wvcc.DataType.NUMBER),
-                wvcc.Property(name="rudelinstinkt", data_type=wvcc.DataType.NUMBER),
-                wvcc.Property(name="sexualinstinkt", data_type=wvcc.DataType.NUMBER),
-                wvcc.Property(name="hundeperspektive", data_type=wvcc.DataType.TEXT)
+                Property(name="gruppen_code", data_type=wvcc.DataType.NUMBER),
+                Property(
+                    name="uebergruppe",
+                    data_type=wvcc.DataType.TEXT,
+                    description="Übergruppe",
+                    index_filterable=True,
+                    index_searchable=True,
+                    tokenization=Tokenization.FIELD
+                ),
+                Property(
+                    name="gruppe",
+                    data_type=wvcc.DataType.TEXT,
+                    description="Instinktgruppe",
+                    index_filterable=True,
+                    index_searchable=True,
+                    tokenization=Tokenization.FIELD
+                ),
+                Property(name="funktion", data_type=wvcc.DataType.TEXT),
+                Property(name="merkmale", data_type=wvcc.DataType.TEXT),
+                Property(name="rassevertreter", data_type=wvcc.DataType.TEXT),
+                Property(name="rassenbeispiele", data_type=wvcc.DataType.TEXT),
+                Property(name="erziehungsanforderung", data_type=wvcc.DataType.TEXT),
+                Property(
+                    name="jagdinstinkt",
+                    data_type=wvcc.DataType.NUMBER,
+                    description="Ausprägung des Jagdinstinkts",
+                    index_filterable=True,
+                    index_searchable=False
+                ),
+                Property(
+                    name="territorialinstinkt",
+                    data_type=wvcc.DataType.NUMBER,
+                    description="Ausprägung des Territorialinstinkts",
+                    index_filterable=True,
+                    index_searchable=False
+                ),
+                Property(name="rudelinstinkt", data_type=wvcc.DataType.NUMBER),
+                Property(name="sexualinstinkt", data_type=wvcc.DataType.NUMBER),
+                Property(name="hundeperspektive", data_type=wvcc.DataType.TEXT)
             ]
         )
 
@@ -72,15 +116,10 @@ def main():
             description="Hunderassen und ihre Zuordnung zu Instinktgruppen",
             vectorizer_config=wvcc.Configure.Vectorizer.text2vec_openai(),
             properties=[
-                wvcc.Property(name="rassename", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="alternative_namen", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="ursprungsland", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="gruppen_code", data_type=wvcc.DataType.NUMBER),
-                wvcc.Property(
-                    name="hatInstinktveranlagung", 
-                    data_type=wvcc.DataType.OBJECT_ARRAY,
-                    reference_to="Instinktveranlagung"
-                )
+                Property(name="rassename", data_type=wvcc.DataType.TEXT),
+                Property(name="alternative_namen", data_type=wvcc.DataType.TEXT),
+                Property(name="ursprungsland", data_type=wvcc.DataType.TEXT),
+                Property(name="gruppen_code", data_type=wvcc.DataType.NUMBER)
             ]
         )
 
@@ -90,16 +129,18 @@ def main():
             description="Erziehungsaufgaben und deren Durchführung",
             vectorizer_config=wvcc.Configure.Vectorizer.text2vec_openai(),
             properties=[
-                wvcc.Property(name="erziehungsaufgabe", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="anleitung", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="hintergrund", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="hundeperspektive", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="relevante_instinkte", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(
-                    name="betrifftInstinkte", 
-                    data_type=wvcc.DataType.OBJECT_ARRAY,
-                    reference_to="Instinkte"
-                )
+                Property(
+                    name="erziehungsaufgabe",
+                    data_type=wvcc.DataType.TEXT,
+                    description="Erziehungsaufgabe",
+                    index_filterable=True,
+                    index_searchable=True,
+                    tokenization=Tokenization.FIELD
+                ),
+                Property(name="anleitung", data_type=wvcc.DataType.TEXT),
+                Property(name="hintergrund", data_type=wvcc.DataType.TEXT),
+                Property(name="hundeperspektive", data_type=wvcc.DataType.TEXT),
+                Property(name="relevante_instinkte", data_type=wvcc.DataType.TEXT)
             ]
         )
 
@@ -109,29 +150,19 @@ def main():
             description="Problematische Verhaltensweisen von Hunden und deren Lösungen",
             vectorizer_config=wvcc.Configure.Vectorizer.text2vec_openai(),
             properties=[
-                wvcc.Property(name="symptom_name", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="schnelldiagnose", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="tags_schnelldiagnose", data_type=wvcc.DataType.TEXT_ARRAY),
-                wvcc.Property(name="hundeperspektive_jagdinstinkt", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="tags_hundeperspektive_jagdinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
-                wvcc.Property(name="hundeperspektive_rudelinstinkt", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="tags_hundeperspektive_rudelinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
-                wvcc.Property(name="hundeperspektive_territorialinstinkt", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="tags_hundeperspektive_territorialinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
-                wvcc.Property(name="hundeperspektive_sexualinstinkt", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="tags_hundeperspektive_sexualinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
-                wvcc.Property(name="erste_hilfe", data_type=wvcc.DataType.TEXT),
-                wvcc.Property(name="tags_erste_hilfe", data_type=wvcc.DataType.TEXT_ARRAY),
-                wvcc.Property(
-                    name="beziehtSichAufInstinkte", 
-                    data_type=wvcc.DataType.OBJECT_ARRAY,
-                    reference_to="Instinkte"
-                ),
-                wvcc.Property(
-                    name="empfohleneErziehungsaufgaben", 
-                    data_type=wvcc.DataType.OBJECT_ARRAY,
-                    reference_to="Erziehung"
-                )
+                Property(name="symptom_name", data_type=wvcc.DataType.TEXT),
+                Property(name="schnelldiagnose", data_type=wvcc.DataType.TEXT),
+                Property(name="tags_schnelldiagnose", data_type=wvcc.DataType.TEXT_ARRAY),
+                Property(name="hundeperspektive_jagdinstinkt", data_type=wvcc.DataType.TEXT),
+                Property(name="tags_hundeperspektive_jagdinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
+                Property(name="hundeperspektive_rudelinstinkt", data_type=wvcc.DataType.TEXT),
+                Property(name="tags_hundeperspektive_rudelinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
+                Property(name="hundeperspektive_territorialinstinkt", data_type=wvcc.DataType.TEXT),
+                Property(name="tags_hundeperspektive_territorialinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
+                Property(name="hundeperspektive_sexualinstinkt", data_type=wvcc.DataType.TEXT),
+                Property(name="tags_hundeperspektive_sexualinstinkt", data_type=wvcc.DataType.TEXT_ARRAY),
+                Property(name="erste_hilfe", data_type=wvcc.DataType.TEXT),
+                Property(name="tags_erste_hilfe", data_type=wvcc.DataType.TEXT_ARRAY)
             ]
         )
         

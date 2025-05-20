@@ -28,9 +28,8 @@ def main():
             try:
                 collection = client.collections.get(class_name)
                 # Verwendung der new Aggregation Methode
-                count = collection.aggregate.over_all().with_meta_count().objects
-                # In v4 wird das Zählergebnis anders zurückgegeben
-                count_value = count[0].meta_count
+                count_result = collection.aggregate.over_all().run()
+                count_value = count_result.total_count
                 print(f"Anzahl der {class_name}-Objekte: {count_value}")
             except Exception as e:
                 print(f"Fehler beim Zählen der {class_name}-Objekte: {e}")
@@ -44,12 +43,17 @@ def main():
             rasse_results = rassen_collection.query.fetch_objects(
                 limit=1,
                 include_vector=False,
-                return_properties=["rassename", "gruppen_code", "hatInstinktveranlagung { gruppe jagdinstinkt territorialinstinkt }"]
+                return_properties=["rassename", "gruppen_code", "hatInstinktveranlagung"]
             )
             
             print("\nTest Rassen -> Instinktveranlagung:")
             if rasse_results.objects:
                 print(json.dumps(rasse_results.objects[0].properties, indent=2))
+                ref = rasse_results.objects[0].properties.get("hatInstinktveranlagung", [])
+                if not ref:
+                    print("⚠️  Keine Referenzen auf Instinktveranlagung gefunden.")
+                else:
+                    print("✅ Rassen → Instinktveranlagung Referenz vorhanden.")
             else:
                 print("Keine Rassen gefunden")
         except Exception as e:
@@ -61,12 +65,17 @@ def main():
             erziehung_results = erziehung_collection.query.fetch_objects(
                 limit=1,
                 include_vector=False,
-                return_properties=["erziehungsaufgabe", "relevante_instinkte", "betrifftInstinkte { instinkt }"]
+                return_properties=["erziehungsaufgabe", "relevante_instinkte", "betrifftInstinkte"]
             )
             
             print("\nTest Erziehung -> Instinkte:")
             if erziehung_results.objects:
                 print(json.dumps(erziehung_results.objects[0].properties, indent=2))
+                ref = erziehung_results.objects[0].properties.get("betrifftInstinkte", [])
+                if not ref:
+                    print("⚠️  Keine Referenzen auf Instinkte gefunden.")
+                else:
+                    print("✅ Erziehung → Instinkte Referenz vorhanden.")
             else:
                 print("Keine Erziehungsaufgaben gefunden")
         except Exception as e:
@@ -78,12 +87,17 @@ def main():
             symptome_results = symptome_collection.query.fetch_objects(
                 limit=1,
                 include_vector=False,
-                return_properties=["symptom_name", "beziehtSichAufInstinkte { instinkt }"]
+                return_properties=["symptom_name", "beziehtSichAufInstinkte"]
             )
             
             print("\nTest Symptome -> Instinkte:")
             if symptome_results.objects:
                 print(json.dumps(symptome_results.objects[0].properties, indent=2))
+                ref = symptome_results.objects[0].properties.get("beziehtSichAufInstinkte", [])
+                if not ref:
+                    print("⚠️  Keine Referenzen auf Instinkte gefunden.")
+                else:
+                    print("✅ Symptome → Instinkte Referenz vorhanden.")
             else:
                 print("Keine Symptome gefunden")
         except Exception as e:
