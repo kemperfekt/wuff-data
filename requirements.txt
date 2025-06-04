@@ -1,0 +1,19 @@
+# Core dependencies for DogBot Ops (Weaviate data management)
+# Updated: December 2024
+
+# Weaviate client for vector database operations
+weaviate-client==4.10.1
+
+# Data processing
+pandas==2.2.3
+openpyxl==3.1.5  # For Excel file handling
+
+# Environment management
+python-dotenv==1.0.1
+
+# Optional: If you need the archive scripts functionality
+# Uncomment the following if using archive/ scripts:
+# pydantic==2.10.4
+# fastapi==0.115.6
+# PyYAML==6.0.2
+# jsonschema==4.24.2
