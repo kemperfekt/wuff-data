@@ -9,7 +9,6 @@ venv/
 .venv/
 
 # Data
-archive/
 *.pkl
 *.db
 *.sqlite3
@@ -23,3 +22,6 @@ archive/
 
 # OS
 .DS_Store
+
+#Other
+.archive

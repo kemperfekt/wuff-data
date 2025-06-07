@@ -11,13 +11,38 @@ This repository manages the Weaviate vector database content and schemas for Dog
 
 ## Local Usage
 
+### Environment Setup
+
+⚠️ **Important**: Configure environment variables before running any scripts:
+
+```bash
+# Copy environment template
+cp .env.template .env
+
+# Edit .env and add your credentials:
+# - WEAVIATE_URL (your Weaviate cluster URL)
+# - WEAVIATE_API_KEY (your Weaviate API key)
+# - OPENAI_APIKEY (your OpenAI API key)
+```
+
+### Running Scripts
+
 ```bash
 # Setup Weaviate with all data
-python setup_dogbot_weaviate.py
+python scripts/setup_dogbot_weaviate.py
+
+# Import specific data
+python scripts/weaviate_data_import.py
 
 # View available options
-python setup_dogbot_weaviate.py --help
+python scripts/setup_dogbot_weaviate.py --help
 ```
+
+### Security Notes
+
+- Never commit `.env` files to version control
+- API keys are loaded from environment variables only
+- All scripts validate configuration before execution
 
 ## Data Collections
 

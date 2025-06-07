@@ -4,23 +4,31 @@ from weaviate.auth import AuthApiKey
 import json
 import uuid
 import os
+import sys
 from weaviate.util import generate_uuid5
+
+# Add parent directory to path to import config
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import config
 
 # Hilfsfunktion zum Generieren einer deterministischen UUID
 def generate_uuid(identifier, namespace="dogbot"):
     return generate_uuid5(f"{namespace}_{identifier}")
 
 def main():
-    # Bestehende Weaviate-Zugangsdaten verwenden
-    weaviate_url = os.environ["WEAVIATE_URL"]
-    weaviate_api_key = os.environ["WEAVIATE_API_KEY"]
-    openai_api_key = os.environ.get("OPENAI_APIKEY")
-
-    # Connect to Weaviate Cloud - verwende die neue Connect-Methode
+    # Use secure configuration module
+    if not config.is_configured:
+        print("Error: Configuration incomplete. Please ensure environment variables are set:")
+        print("- WEAVIATE_URL")
+        print("- WEAVIATE_API_KEY") 
+        print("- OPENAI_APIKEY")
+        return
+    
+    # Connect to Weaviate Cloud using secure configuration
     client = weaviate.connect_to_weaviate_cloud(
-        cluster_url=weaviate_url,
-        auth_credentials=AuthApiKey(api_key=weaviate_api_key),
-        headers={"X-OpenAI-Api-Key": openai_api_key} if openai_api_key else {}
+        cluster_url=config.weaviate_url,
+        auth_credentials=AuthApiKey(api_key=config.weaviate_api_key),
+        headers={"X-OpenAI-Api-Key": config.openai_api_key}
     )
 
     print(f"Weaviate bereit: {client.is_ready()}")

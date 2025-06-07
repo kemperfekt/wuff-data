@@ -1,20 +1,32 @@
-import os
+"""
+Secure Weaviate connection module for DogBot Data.
+Uses environment-based configuration for security.
+"""
 import weaviate
 from weaviate.classes.init import Auth
+from config import config
 
-# Statische Weaviate-URL
-weaviate_url = "https://cpmlrjetsgqskhwx9eqgg.c0.europe-west3.gcp.weaviate.cloud"
 
-# API Keys aus Umgebungsvariable
-weaviate_api_key = os.environ["WEAVIATE_API_KEY"]
-openai_api_key = os.environ["OPENAI_APIKEY"] 
-
-# Verbindung herstellen
 def get_weaviate_client():
+    """
+    Create and return a Weaviate client with secure configuration.
+    
+    Returns:
+        weaviate.WeaviateClient: Configured Weaviate client
+        
+    Raises:
+        ValueError: If required environment variables are not set
+    """
+    if not config.is_configured:
+        raise ValueError(
+            "Weaviate configuration is incomplete. Please ensure the following "
+            "environment variables are set: WEAVIATE_URL, WEAVIATE_API_KEY, OPENAI_APIKEY"
+        )
+    
     return weaviate.connect_to_weaviate_cloud(
-        cluster_url=weaviate_url,
-        auth_credentials=Auth.api_key(weaviate_api_key),
+        cluster_url=config.weaviate_url,
+        auth_credentials=Auth.api_key(config.weaviate_api_key),
         headers={
-        "X-OpenAI-Api-Key": openai_api_key
-    }
+            "X-OpenAI-Api-Key": config.openai_api_key
+        }
     )
