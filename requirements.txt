@@ -2,7 +2,7 @@
 # Updated: December 2024
 
 # Weaviate client for vector database operations
-weaviate-client==4.10.1
+weaviate-client==4.15.2
 
 # Data processing
 pandas==2.2.3
