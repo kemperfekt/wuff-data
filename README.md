@@ -1,60 +1,137 @@
-# DogBot Ops (Data Management)
+# WuffChat Knowledge Base & Data Management
 
-This repository manages the Weaviate vector database content and schemas for DogBot. For comprehensive documentation, please refer to the [main DogBot README](../README.md).
+**Production**: Weaviate vector database | **Content**: 195+ dog breeds, behavioral patterns, training exercises
 
-## Quick Links
+Vector database management system for WuffChat's AI-powered dog behavior consultation platform, providing structured canine knowledge through Weaviate integration.
 
-- 📚 [Full Documentation](../README.md)
-- 🏗️ [Architecture Overview](../README.md#️-architecture-overview)
-- 🧠 [Core Instincts Model](../README.md#core-instincts-model)
-- 🔧 [Development Setup](../README.md#-development)
+## Technical Architecture
 
-## Local Usage
+```mermaid
+graph TB
+    Scripts[Python Scripts] --> Weaviate[(Weaviate Vector DB)]
+    JSON[JSON Data Files] --> Scripts
+    
+    Weaviate --> Collections[Data Collections]
+    Collections --> Breeds[Rassen<br/>195+ Dog Breeds]
+    Collections --> Instincts[Instinkte<br/>4 Core Drives]
+    Collections --> Symptoms[Symptome<br/>Behavioral Patterns]
+    Collections --> Training[Erziehung<br/>Training Exercises]
+    Collections --> Predispositions[Instinktveranlagung<br/>Breed-Specific Tendencies]
+    
+    API[wuff-api] --> Weaviate
+    API --> RAG[RAG Integration<br/>Vector Search]
+```
+
+### Core Collections
+- **Rassen**: 195+ dog breeds with characteristics, temperament, and care requirements
+- **Instinkte**: Four fundamental canine drives (Jagd, Territorial, Rudel, Sexual)
+- **Symptome**: Behavioral symptoms mapped to underlying instincts and root causes
+- **Erziehung**: Training exercises and solutions matched to specific instincts
+- **Instinktveranlagung**: Breed predispositions for instinctual behaviors
+- **Allgemein**: General canine knowledge and behavioral principles
+
+## Data Management
 
 ### Environment Setup
 
-⚠️ **Important**: Configure environment variables before running any scripts:
-
 ```bash
-# Copy environment template
-cp .env.template .env
+# Setup Python environment
+python -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+pip install -r requirements.txt
 
-# Edit .env and add your credentials:
-# - WEAVIATE_URL (your Weaviate cluster URL)
+# Configure environment
+cp .env.template .env
+# Edit .env with your credentials:
+# - WEAVIATE_URL (your Weaviate cluster URL)  
 # - WEAVIATE_API_KEY (your Weaviate API key)
-# - OPENAI_APIKEY (your OpenAI API key)
+# - OPENAI_APIKEY (your OpenAI API key for vectorization)
 ```
 
-### Running Scripts
+### Database Operations
 
 ```bash
-# Setup Weaviate with all data
+# Complete setup with all data collections
 python scripts/setup_dogbot_weaviate.py
 
-# Import specific data
-python scripts/weaviate_data_import.py
+# Import specific data types
+python scripts/weaviate_data_import.py --collection rassen
+python scripts/weaviate_data_import.py --collection instinkte
 
-# View available options
+# Validate data integrity
+python scripts/validate_data.py
+
+# View available options and help
 python scripts/setup_dogbot_weaviate.py --help
 ```
 
-### Security Notes
+## Content-as-Code Philosophy
 
-- Never commit `.env` files to version control
-- API keys are loaded from environment variables only
-- All scripts validate configuration before execution
+### Structured Data Management
+- **Version Control**: All knowledge base content stored as JSON files in Git
+- **Schema Validation**: Pydantic models ensure data consistency
+- **Atomic Updates**: Scripts support incremental updates without data loss
+- **Rollback Support**: Git history enables easy content rollbacks
 
-## Data Collections
+### Data Structure Example
+```json
+{
+  "name": "German Shepherd",
+  "eigenschaften": {
+    "groesse": "groß",
+    "fell": "mittellang, doppelt",
+    "lebenserwartung": "9-13 Jahre"
+  },
+  "instinktveranlagung": {
+    "jagd": 7,
+    "territorial": 9, 
+    "rudel": 8,
+    "sexual": 6
+  },
+  "verhalten": {
+    "aktivitaetslevel": "hoch",
+    "sozialverhalten": "loyal, schützend"
+  }
+}
+```
 
-- **Allgemein**: General dog information
-- **Instinkte**: Core instincts (Jagd, Territorial, Rudel, Sexual)
-- **Instinktveranlagung**: Breed instinct predispositions
-- **Rassen**: Dog breed information
-- **Erziehung**: Training exercises
-- **Symptome**: Behavioral symptoms
+## Vector Search Integration
 
-## Content-as-Code Approach
+### RAG Implementation
+- **Semantic Search**: Context-aware breed and behavior matching
+- **Instinct Mapping**: Automatic linking of behaviors to underlying drives  
+- **Solution Retrieval**: Training exercises matched to specific problems
+- **Multilingual Support**: German content with English technical interfaces
 
-All data is managed as structured JSON files for version control and easy updates.
+### Query Examples
+```python
+# Find breeds suitable for specific behaviors
+results = client.query.get("Rassen").with_near_text({
+    "concepts": ["ruhig", "familienfreundlich", "wenig haaren"]
+}).with_limit(5).do()
 
-For detailed information, see the [main repository documentation](../README.md).
+# Retrieve training exercises for instinct-based behaviors
+exercises = client.query.get("Erziehung").with_where({
+    "path": ["instinkt"],
+    "operator": "Equal", 
+    "valueString": "Jagd"
+}).do()
+```
+
+## Security & Best Practices
+
+### Environment Security
+- **API Keys**: Environment variables only, never committed
+- **Access Control**: Weaviate cluster with authentication enabled
+- **Validation**: Input sanitization for all data operations
+- **Backup Strategy**: Regular exports and version control
+
+### Data Quality Assurance
+- **Schema Validation**: Automated checks during import
+- **Content Review**: Manual verification of behavioral accuracy
+- **Expert Validation**: Canine behavior specialist review process
+- **Continuous Updates**: Regular content updates based on new research
+
+---
+
+**Back to WuffChat meta-repository** - see [wuffchat](https://github.com/kemperfekt/wuffchat) for complete overview
